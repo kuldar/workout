@@ -1,0 +1,58 @@
+# project: arkitdev
+# version: 31
+
+type Resource implements Node {
+  title: String!
+  description: String!
+  websiteUrl: String!
+  githubUrl: String
+  author: Author @relation(name: "ResourceAuthor")
+  image: File @relation(name: "ResourceImage")
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  category: ResourceCategory! @defaultValue(value: ARTICLE)
+  isFeatured: Boolean @defaultValue(value: false)
+  isPublished: Boolean @defaultValue(value: false)
+}
+
+type Author implements Node {
+  name: String!
+  twitterHandle: String
+  websiteUrl: String
+  avatar: File @relation(name: "AuthorAvatar")
+  resources: [Resource!]! @relation(name: "ResourceAuthor")
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type User implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type File implements Node {
+  resource: Resource @relation(name: "ResourceImage")
+  author: Author @relation(name: "AuthorAvatar")
+  name: String!
+  url: String! @isUnique
+  size: Int!
+  contentType: String!
+  secret: String! @isUnique
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ResourceCategory {
+  TUTORIAL
+  ARTICLE
+  TOOL
+}
+
+type Subscriber implements Node {
+  email: String!
+  id: ID! @isUnique
+}
