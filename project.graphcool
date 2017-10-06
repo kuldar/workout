@@ -1,58 +1,51 @@
-# project: arkitdev
-# version: 31
+# project: workout
+# version: 19
 
-type Resource implements Node {
-  title: String!
-  description: String!
-  websiteUrl: String!
-  githubUrl: String
-  author: Author @relation(name: "ResourceAuthor")
-  image: File @relation(name: "ResourceImage")
+type Exercise implements Node {
   id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  category: ResourceCategory! @defaultValue(value: ARTICLE)
-  isFeatured: Boolean @defaultValue(value: false)
-  isPublished: Boolean @defaultValue(value: false)
-}
-
-type Author implements Node {
   name: String!
-  twitterHandle: String
-  websiteUrl: String
-  avatar: File @relation(name: "AuthorAvatar")
-  resources: [Resource!]! @relation(name: "ResourceAuthor")
-  id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type User implements Node {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  sets: [Set!]! @relation(name: "ExerciseSets")
+  workout: Workout @relation(name: "WorkoutExercises")
 }
 
 type File implements Node {
-  resource: Resource @relation(name: "ResourceImage")
-  author: Author @relation(name: "AuthorAvatar")
-  name: String!
-  url: String! @isUnique
-  size: Int!
   contentType: String!
-  secret: String! @isUnique
-  id: ID! @isUnique
   createdAt: DateTime!
+  id: ID! @isUnique
+  name: String!
+  secret: String! @isUnique
+  size: Int!
+  updatedAt: DateTime!
+  url: String! @isUnique
+}
+
+type Session implements Node {
+  createdAt: DateTime!
+  finishedAt: DateTime
+  id: ID! @isUnique
+  sets: [Set!]! @relation(name: "SessionSets")
+  workout: Workout @relation(name: "WorkoutSession")
+}
+
+type Set implements Node {
+  createdAt: DateTime!
+  exercise: Exercise @relation(name: "ExerciseSets")
+  id: ID! @isUnique
+  reps: Int
+  session: Session @relation(name: "SessionSets")
+  time: Int
+  weight: Int
+}
+
+type User implements Node {
+  createdAt: DateTime!
+  id: ID! @isUnique
   updatedAt: DateTime!
 }
 
-enum ResourceCategory {
-  TUTORIAL
-  ARTICLE
-  TOOL
-}
-
-type Subscriber implements Node {
-  email: String!
+type Workout implements Node {
+  exercises: [Exercise!]! @relation(name: "WorkoutExercises")
   id: ID! @isUnique
+  name: String!
+  sessions: [Session!]! @relation(name: "WorkoutSession")
 }
