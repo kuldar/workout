@@ -15,19 +15,19 @@ import App from './App'
 const networkInterface = createNetworkInterface({ uri: config.graphCool.simpleApi })
 
 // Add auth token to network calls
-// networkInterface.use([{
-//   applyMiddleware(req, next) {
+networkInterface.use([{
+  applyMiddleware(req, next) {
 
-//     // Set empty headers if none exist
-//     if (!req.options.headers) { req.options.headers = {} }
+    // Set empty headers if none exist
+    if (!req.options.headers) { req.options.headers = {} }
 
-//     // Add the user auth token to headers if exists
-//     const token = localStorage.getItem(GC_AUTH_TOKEN)
-//     req.options.headers.authorization = token ? `Bearer ${token}` : null
+    // Add the user auth token to headers if exists
+    const token = localStorage.getItem(config.graphCool.authToken)
+    req.options.headers.authorization = token ? `Bearer ${token}` : null
 
-//     next()
-//   }
-// }])
+    next()
+  }
+}])
 
 // Initialize new Apollo client
 const client = new ApolloClient({ networkInterface })

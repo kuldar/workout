@@ -1,25 +1,33 @@
-# projectId: cj8fhfdi908g10124njvggjv5
-# version: 22
+# The following types define the data model
+# based on which the GraphQL API is generated
+
+type User @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  email: String @isUnique
+  name: String!
+  password: String
+  workouts: [Workout!]! @relation(name: "UserWorkouts")
+}
 
 type Exercise @model {
   name: String!
   sets: [Set!]! @relation(name: "ExerciseSets")
+  workouts: [Workout!]! @relation(name: "WorkoutExercises")
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  sessions: [Session!]! @relation(name: "SessionExercises")
-  workouts: [Workout!]! @relation(name: "WorkoutExercises")
 }
 
-type File @model {
+type Workout @model {
+  user: User! @relation(name:"UserWorkouts")
   name: String!
-  size: Int!
-  url: String! @isUnique
-  secret: String! @isUnique
+  exercises: [Exercise!]! @relation(name: "WorkoutExercises")
+  sessions: [Session!]! @relation(name: "WorkoutSession")
   id: ID! @isUnique
-  contentType: String!
-  updatedAt: DateTime!
   createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Session @model {
@@ -29,7 +37,6 @@ type Session @model {
   createdAt: DateTime!
   updatedAt: DateTime!
   finishedAt: DateTime
-  exercises: [Exercise!]! @relation(name: "SessionExercises")
 }
 
 type Set @model {
@@ -43,17 +50,13 @@ type Set @model {
   updatedAt: DateTime!
 }
 
-type User @model {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type Workout @model {
+type File @model {
   name: String!
-  exercises: [Exercise!]! @relation(name: "WorkoutExercises")
-  sessions: [Session!]! @relation(name: "WorkoutSession")
+  size: Int!
+  url: String! @isUnique
+  secret: String! @isUnique
+  contentType: String!
   id: ID! @isUnique
-  createdAt: DateTime!
   updatedAt: DateTime!
+  createdAt: DateTime!
 }

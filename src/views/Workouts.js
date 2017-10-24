@@ -1,34 +1,41 @@
 // Libraries
 import React, { Component } from 'react'
-import { graphql, gql } from 'react-apollo'
+import { graphql, gql, compose } from 'react-apollo'
+
+// Components
+import Header from '../components/Header'
 
 // Workouts view
 class WorkoutsView extends Component {
 
   render() {
+    const { userQuery, allWorkoutsQuery } = this.props
 
-    let query = this.props.allWorkoutsQuery
-    if (query && query.loading) { return <div>Loading...</div> }
-    const workouts = this.props.allWorkoutsQuery.allWorkouts
+    // Check if still loading
+    if (userQuery.loading || allWorkoutsQuery.loading) { return <div>Loading...</div> }
 
-    return (
+    return ([
+      <Header user={ userQuery.loggedInUser.id ? userQuery.loggedInUser : null } />,
       <div>
-        <h1>Workouts</h1>
-        { workouts.map(workout => (
-          <div>
-            <a href={`/workouts/${workout.id}`}><strong>{workout.name}</strong></a> -
-            { workout.exercises.map(exercise => <span> {exercise.name}</span>) }
-          </div>
-        )) }
+        <h2>Workouts</h2>
+        {
+          allWorkoutsQuery.allWorkouts.map(workout => (
+            <div>
+              <a href={`/workouts/${workout.id}`}><strong>{workout.name}</strong></a> -
+              { workout.exercises.map(exercise => <span> {exercise.name}</span>) }
+            </div>
+          ))
+        }
       </div>
-    )
+    ])
   }
 
 }
 
-const ALL_WORKOUTS_QUERY = gql`
-  query AllWorkoutsQuery {
-    allWorkouts {
+// All workouts
+const allWorkoutsQuery = gql`
+  query {
+    allWorkouts(orderBy: createdAt_DESC) {
       id
       name
       exercises {
@@ -38,4 +45,17 @@ const ALL_WORKOUTS_QUERY = gql`
   }
 `
 
-export default graphql(ALL_WORKOUTS_QUERY, {name: 'allWorkoutsQuery'}) (WorkoutsView)
+// Get current user
+const userQuery = gql`
+  query {
+    loggedInUser {
+      id
+      name
+    }
+  }
+`
+
+export default compose(
+  graphql(allWorkoutsQuery, { name: 'allWorkoutsQuery' }),
+  graphql(userQuery, { name: 'userQuery', options: { fetchPolicy: 'network-only' } })
+) (WorkoutsView)

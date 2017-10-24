@@ -3,7 +3,10 @@ import React, { Component } from 'react'
 import { graphql, gql, compose } from 'react-apollo'
 import moment from 'moment'
 
-// Session view
+// Components
+import Header from '../components/Header'
+
+// Workout view
 class WorkoutView extends Component {
 
   // Handle creating a new set
@@ -16,31 +19,35 @@ class WorkoutView extends Component {
   }
 
   render() {
-    if (this.props.workoutQuery.loading) return <div>Loading...</div>
-    const { id, name, exercises, sessions } = this.props.workoutQuery.Workout
+    const { workoutQuery, userQuery } = this.props
 
-    return (
+    if (workoutQuery.loading || userQuery.loading) return <div>Loading...</div>
+    const workout = workoutQuery.Workout
+    const user = userQuery.loggedInUser
+
+    return ([
+      <Header user={ user.id ? user.name : null } />,
       <div>
-        <h1>{name}</h1>
+        <h2>{workout.name}</h2>
         <button onClick={(e) => this.handleCreateSession(e)}>New session</button>
         <br/><br/>
         <div>
           <strong>Exercises:</strong>
-          { exercises.map(exercise => <div>{exercise.name}</div>) }
+          { workout.exercises.map(exercise => <div>{exercise.name}</div>) }
         </div>
         <br/>
         <div>
           <strong>Sessions:</strong>
-          { sessions.map(session => <div><a href={`/sessions/${session.id}`}>{moment(session.createdAt).calendar()}</a></div>) }
+          { workout.sessions.map(session => <div><a href={`/sessions/${session.id}`}>{moment(session.createdAt).calendar()}</a></div>) }
         </div>
       </div>
-    )
+    ])
   }
 
 }
 
 // Current workout query
-const WORKOUT_QUERY = gql`
+const workoutQuery = gql`
   query workoutQuery($id: ID!) {
     Workout(id: $id) {
       id
@@ -64,7 +71,7 @@ const WORKOUT_QUERY = gql`
 `
 
 // Create session mutation
-const CREATE_SESSION_MUTATION = gql`
+const createSessionMutation = gql`
   mutation CreateSessionMutation($workoutId: ID!) {
     createSession(workoutId: $workoutId) {
       id
@@ -72,7 +79,18 @@ const CREATE_SESSION_MUTATION = gql`
   }
 `
 
+// Get current user
+const userQuery = gql`
+  query {
+    loggedInUser {
+      id
+      name
+    }
+  }
+`
+
 export default compose(
-  graphql(WORKOUT_QUERY, { name: 'workoutQuery', options: ({ match }) => ({ variables: { id: match.params.id }}) }),
-  graphql(CREATE_SESSION_MUTATION, { name: 'createSessionMutation' })
+  graphql(workoutQuery, { name: 'workoutQuery', options: ({ match }) => ({ variables: { id: match.params.id }}) }),
+  graphql(createSessionMutation, { name: 'createSessionMutation' }),
+  graphql(userQuery, { name: 'userQuery', options: { fetchPolicy: 'network-only' } })
 )(WorkoutView)

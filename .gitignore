@@ -1,4 +1,10 @@
+# Graph Cool config
+.graphcoolrc
+
+# Dependencies
 node_modules
+
+# Misc
 yarn-error.log
 yarn.lock
 .DS_Store
