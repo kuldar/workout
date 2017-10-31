@@ -17,7 +17,7 @@ class SessionView extends Component {
     const user = userQuery.loggedInUser
 
     return ([
-      <Header user={ user.id ? user.name : null } />,
+      <Header user={ user.id && user } />,
       <div>
         <div><strong>Workout:</strong> <a href={`/workouts/${session.workout.id}`}>{session.workout.name}</a></div>
         <div><strong>Date:</strong> {moment(session.createdAt).calendar()}</div>

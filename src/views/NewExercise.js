@@ -5,12 +5,20 @@ import { graphql, gql, compose } from 'react-apollo'
 // Components
 import Header from '../components/Header'
 
+// Styles
+const wrapper = {
+  maxWidth: '60rem',
+  margin: '0 auto',
+  padding: '0 1rem'
+}
+
 // New exercise view
 class NewExerciseView extends Component {
 
   // Initial state
   state = {
-    name: ''
+    name: '',
+    description: ''
   }
 
   // Create a new exercise
@@ -23,26 +31,43 @@ class NewExerciseView extends Component {
       return
     }
 
-    const { name } = this.state
-    let response = await this.props.createExerciseMutation({ variables: { name } })
+    const { name, description } = this.state
+    let response = await this.props.createExerciseMutation({ variables: { name, description } })
 
-    window.location.assign(`/exercises/${response.createExerciseMutation.createExercise.id}`)
+    window.location.assign(`/exercises/${response.data.createExercise.id}`)
   }
 
   render() {
-    if (this.props.userQuery.loading) return <div>Loading...</div>
+    const { userQuery } = this.props
+    if (userQuery.loading) return <div>Loading...</div>
+    const user = userQuery.loggedInUser
 
     return ([
-      <Header user={ this.props.userQuery.loggedInUser.id ? this.props.userQuery.loggedInUser.name : null } />,
-      <form>
-        <input
-          placeholder='Name'
-          value={this.state.name}
-          onChange={(e) => this.setState({ name: e.target.value })}
-          type='text' />
-
-        <button onClick={(e) => this.createExercise(e)}>New exercise</button>
-      </form>
+      <Header user={ user.id && user } />,
+      <div style={wrapper}>
+        <h2>New exercise</h2>
+        <hr/>
+        <br/>
+        <form>
+          <div>
+            <input
+              placeholder='Name'
+              value={this.state.name}
+              onChange={(e) => this.setState({ name: e.target.value })}
+              type='text' />
+          </div>
+          <br/>
+          <div>
+            <textarea
+              placeholder='Description'
+              value={this.state.description}
+              onChange={(e) => this.setState({ description: e.target.value })}>
+            </textarea>
+          </div>
+          <br/>
+          <button onClick={(e) => this.createExercise(e)}>Create exercise</button>
+        </form>
+      </div>
     ])
   }
 
@@ -50,9 +75,10 @@ class NewExerciseView extends Component {
 
 // Create workout mutation
 const createExerciseMutation = gql`
-  mutation($name: String!) {
+  mutation($name: String!, $description: String!) {
     createExercise(
-      name: $name
+      name: $name,
+      description: $description
     ) {
       id
     }

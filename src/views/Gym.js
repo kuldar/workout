@@ -3,14 +3,25 @@ import React, { Component } from 'react'
 import { graphql, gql, compose } from 'react-apollo'
 import moment from 'moment'
 
+// Components
+import Header from '../components/Header'
+
+// Styles
+const wrapper = {
+  maxWidth: '60rem',
+  margin: '0 auto',
+  padding: '0 1rem'
+}
+
 // Gym view
 class GymView extends Component {
 
   // Create new workout session
   createWorkoutSession = async (e, workoutId) => {
     e.preventDefault()
-    let response = await this.props.createSessionMutation({ variables: { workoutId } })
-    this.props.history.push(`/gym/${response.data.createSession.id}`)
+    const userId = this.props.userQuery.loggedInUser.id
+    let response = await this.props.createSessionMutation({ variables: { workoutId, userId } })
+    window.location.assign(`/gym/${response.data.createSession.id}`)
   }
 
   render() {
@@ -22,24 +33,35 @@ class GymView extends Component {
     const user = userQuery.loggedInUser
     const workouts = userWorkoutsQuery.allWorkouts
 
-    return (
-      <div>
-        <strong>Select a workout</strong>
-        { workouts && workouts.map(workout => (
-          <button onClick={(e) => this.createWorkoutSession(e, workout.id)}>
-            {workout.name}
-          </button>
-        ))}
+    return ([
+      <Header user={ user.id && user } />,
+      <div style={wrapper}>
+        <h2>👇  Select a workout</h2>
+        <hr/>
+        <ul>
+          {
+            workouts && workouts.map(workout => (
+              <li>
+                <a href='#' onClick={(e) => this.createWorkoutSession(e, workout.id)}>
+                  Start <strong>{workout.name}</strong> session
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-    )
+    ])
   }
 
 }
 
 // Create session mutation
 const createSessionMutation = gql`
-  mutation CreateSessionMutation($workoutId: ID!) {
-    createSession(workoutId: $workoutId) {
+  mutation CreateSessionMutation($workoutId: ID!, $userId: ID!) {
+    createSession(
+      workoutId: $workoutId
+      userId: $userId
+    ) {
       id
     }
   }

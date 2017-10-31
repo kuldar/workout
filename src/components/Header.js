@@ -32,7 +32,11 @@ const Header = ({ user }) => {
   return (
     <div style={header}>
       <div style={headerTitle}>
-        { user && <span>Hello, <a href={`/members/${user.id}`}>{user.name}</a></span> }
+        {
+          user
+          ? <span>Hello, <a href={`/members/${user.id}`}>{user.name}</a></span>
+          : <a href={`/`}>Workout.wtf</a>
+        }
       </div>
       <nav>
         {
@@ -42,7 +46,6 @@ const Header = ({ user }) => {
               <a href='/gym' style={headerNavLink}>Hit the gym</a>,
               <a href='/workouts' style={headerNavLink}>Workouts</a>,
               <a href='/exercises' style={headerNavLink}>Exercises</a>,
-              <a href='/exercises/new' style={headerNavLink}>New exercise</a>,
               <a href='/sessions' style={headerNavLink}>Sessions</a>,
               <a onClick={(e) => handleLogout(e)} href='#' style={headerNavLink}>Logout</a>
             ]

@@ -5,42 +5,46 @@ import { graphql, gql, compose } from 'react-apollo'
 // Components
 import Header from '../components/Header'
 
+// Styles
+const wrapper = {
+  maxWidth: '60rem',
+  margin: '0 auto',
+  padding: '0 1rem'
+}
+
 // Workouts view
 class WorkoutsView extends Component {
 
   render() {
-    const { userQuery, allWorkoutsQuery } = this.props
+    const { allWorkoutsQuery, userQuery } = this.props
 
-    // Check if still loading
-    if (userQuery.loading || allWorkoutsQuery.loading) { return <div>Loading...</div> }
+    if (allWorkoutsQuery.loading || userQuery.loading) return <div>Loading...</div>
+    const workouts = allWorkoutsQuery.allWorkouts
+    const user = userQuery.loggedInUser
 
     return ([
-      <Header user={ userQuery.loggedInUser.id ? userQuery.loggedInUser : null } />,
-      <div>
-        <h2>Workouts</h2>
-        {
-          allWorkoutsQuery.allWorkouts.map(workout => (
-            <div>
-              <a href={`/workouts/${workout.id}`}><strong>{workout.name}</strong></a> -
-              { workout.exercises.map(exercise => <span> {exercise.name}</span>) }
-            </div>
-          ))
-        }
+      <Header user={ user.id && user } />,
+      <div style={wrapper}>
+        <h2>💪  Workouts</h2>
+        <hr />
+        <a href='/workouts/new'>New workout</a>
+        <div>
+          <ul>
+            { workouts.map(workout => <li><a href={`/workouts/${workout.id}`}>{workout.name}</a></li>) }
+          </ul>
+        </div>
       </div>
     ])
   }
 
 }
 
-// All workouts
+// Workouts query
 const allWorkoutsQuery = gql`
-  query {
+  query allWorkoutsQuery {
     allWorkouts(orderBy: createdAt_DESC) {
       id
       name
-      exercises {
-        name
-      }
     }
   }
 `
@@ -58,4 +62,4 @@ const userQuery = gql`
 export default compose(
   graphql(allWorkoutsQuery, { name: 'allWorkoutsQuery' }),
   graphql(userQuery, { name: 'userQuery', options: { fetchPolicy: 'network-only' } })
-) (WorkoutsView)
+)(WorkoutsView)

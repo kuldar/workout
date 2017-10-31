@@ -6,6 +6,13 @@ import moment from 'moment'
 // Components
 import Header from '../components/Header'
 
+// Styles
+const wrapper = {
+  maxWidth: '60rem',
+  margin: '0 auto',
+  padding: '0 1rem'
+}
+
 // Workout view
 class WorkoutView extends Component {
 
@@ -26,19 +33,25 @@ class WorkoutView extends Component {
     const user = userQuery.loggedInUser
 
     return ([
-      <Header user={ user.id ? user.name : null } />,
-      <div>
+      <Header user={ user.id && user } />,
+      <div style={wrapper}>
         <h2>{workout.name}</h2>
-        <button onClick={(e) => this.handleCreateSession(e)}>New session</button>
-        <br/><br/>
         <div>
-          <strong>Exercises:</strong>
-          { workout.exercises.map(exercise => <div>{exercise.name}</div>) }
+          <p>{workout.description}</p>
+        </div>
+        <hr />
+        <div>
+          <h3>🏋️  Exercises:</h3>
+          <ul>
+            { workout.exercises.map(exercise => <li><a href={`/exercises/${exercise.id}`}>{exercise.name}</a></li>) }
+          </ul>
         </div>
         <br/>
         <div>
-          <strong>Sessions:</strong>
-          { workout.sessions.map(session => <div><a href={`/sessions/${session.id}`}>{moment(session.createdAt).calendar()}</a></div>) }
+          <h3>📆  Sessions:</h3>
+          <ul>
+            { workout.sessions.map(session => <li><a href={`/sessions/${session.id}`}>{moment(session.createdAt).calendar()}</a></li>) }
+          </ul>
         </div>
       </div>
     ])
@@ -52,6 +65,7 @@ const workoutQuery = gql`
     Workout(id: $id) {
       id
       name
+      description
       sessions {
         id
         createdAt
@@ -59,12 +73,6 @@ const workoutQuery = gql`
       exercises {
         id
         name
-        sets {
-          id
-          reps
-          weight
-          time
-        }
       }
     }
   }

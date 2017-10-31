@@ -30,7 +30,7 @@ class JoinView extends Component {
     this.setState({ isLoading: true })
 
     // Call the createUserMutation
-    const response = await this.props.createUser({
+    const response = await this.props.createUserMutation({
       variables: { name, email, password }
     })
 
@@ -114,6 +114,6 @@ const userQuery = gql`
 `
 
 export default compose(
-  graphql(createUserMutation, { name: 'createUser' }),
+  graphql(createUserMutation, { name: 'createUserMutation' }),
   graphql(userQuery, { name: 'userQuery', options: { fetchPolicy: 'network-only' } })
 ) (withRouter(JoinView))

@@ -2,37 +2,45 @@
 # based on which the GraphQL API is generated
 
 type User @model {
+  name: String!
+  email: String @isUnique
+  password: String
+  workouts: [Workout!]! @relation(name: "UserWorkouts")
+  sessions: [Session!]! @relation(name:"UserSessions")
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  email: String @isUnique
-  name: String!
-  password: String
-  workouts: [Workout!]! @relation(name: "UserWorkouts")
 }
 
 type Exercise @model {
   name: String!
+  description: String!
   sets: [Set!]! @relation(name: "ExerciseSets")
   workouts: [Workout!]! @relation(name: "WorkoutExercises")
+  visibility: Visibility! @defaultValue(value: PRIVATE)
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 type Workout @model {
-  user: User! @relation(name:"UserWorkouts")
   name: String!
+  description: String!
+  user: User! @relation(name:"UserWorkouts")
   exercises: [Exercise!]! @relation(name: "WorkoutExercises")
   sessions: [Session!]! @relation(name: "WorkoutSession")
+  visibility: Visibility! @defaultValue(value: PRIVATE)
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 type Session @model {
+  description: String
+  user: User! @relation(name:"UserSessions")
   sets: [Set!]! @relation(name: "SessionSets")
   workout: Workout @relation(name: "WorkoutSession")
+  visibility: Visibility! @defaultValue(value: PRIVATE)
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -43,6 +51,7 @@ type Set @model {
   reps: Int
   time: Int
   weight: Int
+  distance: Int
   session: Session @relation(name: "SessionSets")
   exercise: Exercise @relation(name: "ExerciseSets")
   id: ID! @isUnique
@@ -59,4 +68,9 @@ type File @model {
   id: ID! @isUnique
   updatedAt: DateTime!
   createdAt: DateTime!
+}
+
+enum Visibility {
+  PRIVATE
+  PUBLIC
 }
