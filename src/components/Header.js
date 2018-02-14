@@ -35,7 +35,7 @@ const Header = ({ user }) => {
         {
           user
           ? <span>Hello, <a href={`/members/${user.id}`}>{user.name}</a></span>
-          : <a href={`/`}>Workout.wtf</a>
+          : <a href={`/`}>Workout &bull; Pro</a>
         }
       </div>
       <nav>
